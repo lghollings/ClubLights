@@ -1,77 +1,66 @@
-// Controlling IKEA DIODER LED strips with Arduino and Freetronics NDRIVE N-MOSFET shield
-// CC by-sa-nc John Boxall 2015 - tronixstuff.com 
-// Components from tronixlabs.com
+#include "TimerObject.h"
 
+    
 #define red 3
 #define green 9
 #define blue 10
 #define delaya 2
 
+int g_iR = 0;
+int g_iG = 0;
+int g_iB = 0;
+int g_iRratio = 2.56;
+int g_iGratio = 2.56;
+int g_iBratio = 2.56;
+int g_bpm = 122;
+Timer *timer1 = new Timer(480);
+
 void setup() 
 {
+  timer1->setOnTimer(&pulseLED);
+  timer1->Start();
   pinMode(red, OUTPUT);
   pinMode(green, OUTPUT);
   pinMode(blue, OUTPUT);
 }
 
-void blinkRGB()
+void pulseLED()
 {
-  digitalWrite(red, HIGH);
-  delay(1000);
-  digitalWrite(red, LOW);
-  digitalWrite(green, HIGH);
-  delay(1000);
-  digitalWrite(green, LOW);
-  digitalWrite(blue, HIGH);
-  delay(1000);
-  digitalWrite(blue, LOW);
+  for (int i=0, i<100, i++)
+  {
+    g_iR = g_iR + (i * 1.6);
+    g_iG = g+iG + 0;
+    g_iB = g_iB + (i * 2.35);
+    analogWrite(red,g_iR);
+    analogWrite(green,g_iG);
+    analogWrite(blue,g_iB);
+  }
+  delay(500)
 }
 
-void pulseRed()
-{
-  for (int i=0; i<256; i++)
-  {
-    analogWrite(red,i);
-    delay(delaya);
-  }
-  for (int i=255; i>=0; --i)
-  {
-    analogWrite(red,i);
-    delay(delaya);
-  }
+void button1push()
+{ 
+  
+  g_iRratio = 1.6;
+  g_iGratio = 0;
+  g_iBratio = 2.35;
 }
 
-void pulseGreen()
-{
-  for (int i=0; i<256; i++)
-  {
-    analogWrite(green,i);
-    delay(delaya);
-  }
-  for (int i=255; i>=0; --i)
-  {
-    analogWrite(green,i);
-    delay(delaya);
-  }
+void button2push()
+{ 
+  
+  g_iRratio = 0;
+  g_iGratio = 0;
+  g_iBratio = 2.00;
 }
 
-void pulseBlue()
+void rotaryPot()
 {
-  for (int i=0; i<256; i++)
-  {
-    analogWrite(blue,i);
-    delay(delaya);
-  }
-  for (int i=255; i>=0; --i)
-  {
-    analogWrite(blue,i);
-    delay(delaya);
-  }
+  g_bpm = 125;
+  
 }
 
 void loop()
 {
-  pulseRed();
-  pulseGreen();
-  pulseBlue();
+  timer1->Update();
 }
