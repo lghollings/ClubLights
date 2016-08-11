@@ -1,4 +1,4 @@
-#include "TimerObject.h"
+#include "TimerOne.h"
 
     
 #define red 3
@@ -13,12 +13,19 @@ int g_iRratio = 2.56;
 int g_iGratio = 2.56;
 int g_iBratio = 2.56;
 int g_bpm = 122;
-Timer *timer1 = new Timer(480);
+
 
 void setup() 
 {
-  timer1->setOnTimer(&pulseLED);
-  timer1->Start();
+  /* 
+   * 483870 - 124
+   * 480000 - 125
+   * 476190 - 126
+   * 472440 - 127
+   * 468750 - 128
+   */
+  Timer1.initialize(60000000/125);
+  Timer1.attachInterrupt(beatTimer);
   pinMode(red, OUTPUT);
   pinMode(green, OUTPUT);
   pinMode(blue, OUTPUT);
@@ -26,16 +33,16 @@ void setup()
 
 void pulseLED()
 {
-  for (int i=0, i<100, i++)
+  for (int i = 0; i < 100; i = i + 1)
   {
     g_iR = g_iR + (i * 1.6);
-    g_iG = g+iG + 0;
+    g_iG = g_iG + 0;
     g_iB = g_iB + (i * 2.35);
     analogWrite(red,g_iR);
     analogWrite(green,g_iG);
     analogWrite(blue,g_iB);
   }
-  delay(500)
+  delay(500);
 }
 
 void button1push()
@@ -60,7 +67,12 @@ void rotaryPot()
   
 }
 
+void beatTimer()
+{
+  digitalWrite(13, digitalRead(13) ^ 1);
+}
+
 void loop()
 {
-  timer1->Update();
+  
 }
