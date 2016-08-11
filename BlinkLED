@@ -1,4 +1,4 @@
-#include "TimerOne.h"
+//#include "TimerOne.h"
 
     
 #define red 3
@@ -13,10 +13,14 @@ int g_iRratio = 2.56;
 int g_iGratio = 2.56;
 int g_iBratio = 2.56;
 int g_bpm = 122;
+int g_bpmMS = 60000 / g_bpm
+unsigned long timeMS = 0;
 
-
+//*********************************
 void setup() 
 {
+    serial.begin(9600)
+    delay(150)
   /* 
    * 483870 - 124
    * 480000 - 125
@@ -24,15 +28,27 @@ void setup()
    * 472440 - 127
    * 468750 - 128
    */
-  Timer1.initialize(60000000/125);
-  Timer1.attachInterrupt(beatTimer);
+  //Timer1.initialize(60000000/g_bpm);
+  //Timer1.attachInterrupt(beatTimer); //RUN BEAT TIMER METHOD continuously on timer
   pinMode(red, OUTPUT);
   pinMode(green, OUTPUT);
   pinMode(blue, OUTPUT);
 }
 
+//*********************************
+void loop()
+{
+    timeMS = millis()
+        while((millis() - timeMS) < g_bpmMS)
+    {
+        digitalWrite(13, digitalRead(13) ^ 1);;
+    }
+}
+
+//*********************************
 void pulseLED()
 {
+/*
   for (int i = 0; i < 100; i = i + 1)
   {
     g_iR = g_iR + (i * 1.6);
@@ -42,9 +58,11 @@ void pulseLED()
     analogWrite(green,g_iG);
     analogWrite(blue,g_iB);
   }
+  */
   delay(500);
 }
 
+//*********************************
 void button1push()
 { 
   
@@ -53,6 +71,7 @@ void button1push()
   g_iBratio = 2.35;
 }
 
+//*********************************
 void button2push()
 { 
   
@@ -61,18 +80,17 @@ void button2push()
   g_iBratio = 2.00;
 }
 
+//*********************************
 void rotaryPot()
 {
   g_bpm = 125;
   
 }
 
+//*********************************
 void beatTimer()
 {
   digitalWrite(13, digitalRead(13) ^ 1);
 }
 
-void loop()
-{
-  
-}
+
