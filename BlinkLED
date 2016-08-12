@@ -12,15 +12,15 @@ int g_iB = 0;
 int g_iRratio = 2.56;
 int g_iGratio = 2.56;
 int g_iBratio = 2.56;
-int g_bpm = 122;
-int g_bpmMS = 60000 / g_bpm
+unsigned long g_bpm = 120;
+unsigned long g_bpmMS = 60000 / g_bpm;
 unsigned long timeMS = 0;
 
 //*********************************
 void setup() 
 {
-    serial.begin(9600)
-    delay(150)
+    Serial.begin(9600);
+    delay(150);
   /* 
    * 483870 - 124
    * 480000 - 125
@@ -38,10 +38,19 @@ void setup()
 //*********************************
 void loop()
 {
-    timeMS = millis()
-        while((millis() - timeMS) < g_bpmMS)
+    unsigned long rampValue = 0;
+    timeMS = millis();
+        while((millis() - timeMS) < (g_bpmMS / 2))
     {
-        digitalWrite(13, digitalRead(13) ^ 1);;
+        rampValue = rampValue + (250 / (g_bpmMS / 2));
+        Serial.println(rampValue);
+    }
+    beatTimer();
+    timeMS = millis();
+        while((millis() - timeMS) < (g_bpmMS / 2))
+    {
+        rampValue = rampValue - (250 / (g_bpmMS / 2));
+        Serial.println(rampValue);
     }
 }
 
@@ -92,5 +101,3 @@ void beatTimer()
 {
   digitalWrite(13, digitalRead(13) ^ 1);
 }
-
-
