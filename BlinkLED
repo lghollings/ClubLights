@@ -1,33 +1,41 @@
 //#include "TimerOne.h"
+#include "Adafruit_LEDBackpack.h"
+#include "Adafruit_GFX.h"
+#include <Wire.h>
 
-    
 #define red 3
 #define green 9
 #define blue 10
 #define delaya 2
 
+Adafruit_7segment matrix = Adafruit_7segment();
 int g_iR = 0;
 int g_iG = 0;
 int g_iB = 0;
 int g_iRratio = 2.56;
 int g_iGratio = 2.56;
 int g_iBratio = 2.56;
-unsigned long g_bpm = 120;
+int potPin = 2;
+int potVal = 0;
+int buttonPin = 3;
+unsigned long g_bpm = 100;
 unsigned long g_bpmMS = 60000 / g_bpm;
 unsigned long timeMS = 0;
 
 //*********************************
-void setup() 
+void setup()
 {
-    Serial.begin(9600);
-    delay(150);
-  /* 
-   * 483870 - 124
-   * 480000 - 125
-   * 476190 - 126
-   * 472440 - 127
-   * 468750 - 128
-   */
+  Serial.begin(9600);
+  delay(150);
+  matrix.print(g_bpm);
+  attachInterrupt(digitalPinToInterrupt(buttonPin), beatTimer, RISING);
+  /*
+     483870 - 124
+     480000 - 125
+     476190 - 126
+     472440 - 127
+     468750 - 128
+  */
   //Timer1.initialize(60000000/g_bpm);
   //Timer1.attachInterrupt(beatTimer); //RUN BEAT TIMER METHOD continuously on timer
   pinMode(red, OUTPUT);
@@ -38,43 +46,55 @@ void setup()
 //*********************************
 void loop()
 {
-    unsigned long rampValue = 0;
-    timeMS = millis();
-        while((millis() - timeMS) < (g_bpmMS / 2))
-    {
-        rampValue = rampValue + (250 / (g_bpmMS / 2));
-        Serial.println(rampValue);
-    }
-    beatTimer();
-    timeMS = millis();
-        while((millis() - timeMS) < (g_bpmMS / 2))
-    {
-        rampValue = rampValue - (250 / (g_bpmMS / 2));
-        Serial.println(rampValue);
-    }
+  //Serial.println(g_bpm);
+  //Serial.println(millis());
+  unsigned long rampValue = 0;
+  potVal = analogRead(0); //read pin 2 analog value from pot each loop
+  //Minimum value = 0
+  //Maximum value = 1023
+  Serial.println(potVal);
+  Serial.println(g_bpm);
+  delay(1);
+  timeMS = millis();
+  g_bpm = 115 + (potVal / (1023 / 20)); //40bpm spread starting at 100 bpm
+  g_bpmMS = 60000 / g_bpm;
+  while ((millis() - timeMS) < (g_bpmMS / 2))
+  {
+    rampValue = rampValue + (250 / (g_bpmMS / 2));
+    //Serial.println(rampValue);
+    matrix.print(rampValue);
+  }
+  //beatTimer();
+  timeMS = millis();
+  while ((millis() - timeMS) < (g_bpmMS / 2))
+  {
+    rampValue = rampValue - (250 / (g_bpmMS / 2));
+    //Serial.println(rampValue);
+    matrix.print(rampValue);
+  }
 }
 
 //*********************************
 void pulseLED()
 {
-/*
-  for (int i = 0; i < 100; i = i + 1)
-  {
-    g_iR = g_iR + (i * 1.6);
-    g_iG = g_iG + 0;
-    g_iB = g_iB + (i * 2.35);
-    analogWrite(red,g_iR);
-    analogWrite(green,g_iG);
-    analogWrite(blue,g_iB);
-  }
+  /*
+    for (int i = 0; i < 100; i = i + 1)
+    {
+      g_iR = g_iR + (i * 1.6);
+      g_iG = g_iG + 0;
+      g_iB = g_iB + (i * 2.35);
+      analogWrite(red,g_iR);
+      analogWrite(green,g_iG);
+      analogWrite(blue,g_iB);
+    }
   */
   delay(500);
 }
 
 //*********************************
 void button1push()
-{ 
-  
+{
+
   g_iRratio = 1.6;
   g_iGratio = 0;
   g_iBratio = 2.35;
@@ -82,8 +102,8 @@ void button1push()
 
 //*********************************
 void button2push()
-{ 
-  
+{
+
   g_iRratio = 0;
   g_iGratio = 0;
   g_iBratio = 2.00;
@@ -93,11 +113,14 @@ void button2push()
 void rotaryPot()
 {
   g_bpm = 125;
-  
+  Serial.println(potVal);
+  delay(1);
 }
 
 //*********************************
 void beatTimer()
 {
   digitalWrite(13, digitalRead(13) ^ 1);
+  g_bpm = g_bpm + 1;
+  Serial.println(g_bpm);
 }
