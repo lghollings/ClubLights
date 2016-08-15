@@ -1,4 +1,3 @@
-//#include "TimerOne.h"
 #include "Adafruit_LEDBackpack.h"
 #include "Adafruit_GFX.h"
 #include <Wire.h>
@@ -29,15 +28,7 @@ void setup()
   delay(150);
   matrix.print(g_bpm);
   attachInterrupt(digitalPinToInterrupt(buttonPin), beatTimer, RISING);
-  /*
-     483870 - 124
-     480000 - 125
-     476190 - 126
-     472440 - 127
-     468750 - 128
-  */
-  //Timer1.initialize(60000000/g_bpm);
-  //Timer1.attachInterrupt(beatTimer); //RUN BEAT TIMER METHOD continuously on timer
+
   pinMode(red, OUTPUT);
   pinMode(green, OUTPUT);
   pinMode(blue, OUTPUT);
@@ -78,7 +69,7 @@ void loop()
 
 void button1push()
 {
-
+//Rotate through light sequences
   g_iRratio = 1.6;
   g_iGratio = 0;
   g_iBratio = 2.35;
@@ -91,14 +82,6 @@ void button2push()
   g_iRratio = 0;
   g_iGratio = 0;
   g_iBratio = 2.00;
-}
-
-//*********************************
-void rotaryPot()
-{
-  g_bpm = 125;
-  Serial.println(potVal);
-  delay(1);
 }
 
 //*********************************
