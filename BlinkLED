@@ -17,6 +17,7 @@ int g_iBratio = 2.56;
 int potPin = 2;
 int potVal = 0;
 int buttonPin = 3;
+int lightPattern = 0;
 unsigned long g_bpm = 100;
 unsigned long g_bpmMS = 60000 / g_bpm;
 unsigned long timeMS = 0;
@@ -28,7 +29,6 @@ void setup()
   delay(150);
   matrix.print(g_bpm);
   attachInterrupt(digitalPinToInterrupt(buttonPin), beatTimer, RISING);
-
   pinMode(red, OUTPUT);
   pinMode(green, OUTPUT);
   pinMode(blue, OUTPUT);
@@ -39,15 +39,49 @@ void loop()
 {
   //Serial.println(g_bpm);
   //Serial.println(millis());
+  
+  //potVal = analogRead(0); //read pin 2 analog value from pot each loop
+  //Serial.println(potVal);
+  //Serial.println(g_bpm);
+  
+  //matrix.writeDigitNum(
+  
+  //g_bpm = 115 + (potVal / (1023 / 20)); //40bpm spread starting at 100 bpm
+  
+  Serial.println(lightPattern);
+  if (lightPattern == 0)
+  {
+    Serial.println("Running light pattern 1");
+    lightPattern1();
+  }
+  else if (lightPattern == 1)
+  {
+    Serial.println("Running light pattern 2");
+    lightPattern2();
+  }
+  else if (lightPattern == 2)
+  {
+    Serial.println("Running light pattern 3");
+    lightPattern3();
+  }
+  else if (lightPattern == 3)
+  {
+    Serial.println("Running light pattern 4");
+    lightPattern4();
+  }
+  else if (lightPattern == 4)
+  {
+    Serial.println("Running light pattern 5");
+    lightPattern5();
+  }
+}
+//*********************************
+void lightPattern1()
+{
   unsigned long rampValue = 0;
-  potVal = analogRead(0); //read pin 2 analog value from pot each loop
-  //Minimum value = 0
-  //Maximum value = 1023
-  Serial.println(potVal);
-  Serial.println(g_bpm);
   delay(1);
   timeMS = millis();
-  g_bpm = 115 + (potVal / (1023 / 20)); //40bpm spread starting at 100 bpm
+  g_bpm = rotaryPotBpm(analogRead(0));
   g_bpmMS = 60000 / g_bpm;
   while ((millis() - timeMS) < (g_bpmMS / 2))
   {
@@ -64,24 +98,92 @@ void loop()
     matrix.print(rampValue);
   }
 }
+//*********************************
+void lightPattern2()
+{
+  
+}
+//*********************************
+void lightPattern3()
+{
+  
+}
+//*********************************
+void lightPattern4()
+{
+  
+}
+//*********************************
+void lightPattern5()
+{
+  
+}
 
 //*********************************
-
 void button1push()
 {
-//Rotate through light sequences
-  g_iRratio = 1.6;
-  g_iGratio = 0;
-  g_iBratio = 2.35;
+lightPattern = lightPattern + 1;
+if (lightPattern = 4)
+{ 
+  lightPattern = 0; 
+}
+Serial.println("lightPattern = " + lightPattern);
 }
 
 //*********************************
 void button2push()
 {
 
-  g_iRratio = 0;
-  g_iGratio = 0;
-  g_iBratio = 2.00;
+}
+
+//*********************************
+int rotaryPotBpm(int inputVal)
+{
+  Serial.println(inputVal);
+  if(inputVal < 51)
+  { g_bpm = 115; }
+  else if(inputVal < 102)
+  { g_bpm = 116; }
+  else if(inputVal < 153)
+  { g_bpm = 117; }
+  else if(inputVal < 205)
+  { g_bpm = 118; }
+  else if(inputVal < 256)
+  { g_bpm = 119; }
+  else if(inputVal < 307)
+  { g_bpm = 120; }
+  else if(inputVal < 358)
+  { g_bpm = 121; }
+  else if(inputVal < 409)
+  { g_bpm = 122; }
+  else if(inputVal < 460)
+  { g_bpm = 123; }
+  else if(inputVal < 512)
+  { g_bpm = 124; }
+  else if(inputVal < 563)
+  { g_bpm = 125; }
+  else if(inputVal < 614)
+  { g_bpm = 126; }
+  else if(inputVal < 665)
+  { g_bpm = 127; }
+  else if(inputVal < 716)
+  { g_bpm = 128; }
+  else if(inputVal < 767)
+  { g_bpm = 129; }
+  else if(inputVal < 818)
+  { g_bpm = 130; }
+  else if(inputVal < 870)
+  { g_bpm = 131; }
+  else if(inputVal < 921)
+  { g_bpm = 132; }
+  else if(inputVal < 972)
+  { g_bpm = 133; }
+  else if(inputVal < 1023)
+  { g_bpm = 134; }
+  else if(inputVal < 1023)
+  { g_bpm = 134; }
+  Serial.println(g_bpm);
+  return g_bpm;
 }
 
 //*********************************
