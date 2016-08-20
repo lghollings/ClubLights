@@ -3,8 +3,8 @@
 #include <Wire.h>
 
 #define red 3
-#define green 9
-#define blue 10
+#define green 6
+#define blue 5
 #define delaya 2
 
 Adafruit_7segment matrix = Adafruit_7segment();
@@ -42,36 +42,36 @@ void loop()
   
   //potVal = analogRead(0); //read pin 2 analog value from pot each loop
   //Serial.println(potVal);
-  //Serial.println(g_bpm);
+  Serial.println(g_bpm);
   
   //matrix.writeDigitNum(
   
   //g_bpm = 115 + (potVal / (1023 / 20)); //40bpm spread starting at 100 bpm
   
-  Serial.println(lightPattern);
+  //Serial.println(lightPattern);
   if (lightPattern == 0)
   {
-    Serial.println("Running light pattern 1");
+    //Serial.println("Running light pattern 1");
     lightPattern1();
   }
   else if (lightPattern == 1)
   {
-    Serial.println("Running light pattern 2");
+    //Serial.println("Running light pattern 2");
     lightPattern2();
   }
   else if (lightPattern == 2)
   {
-    Serial.println("Running light pattern 3");
+    //Serial.println("Running light pattern 3");
     lightPattern3();
   }
   else if (lightPattern == 3)
   {
-    Serial.println("Running light pattern 4");
+    //Serial.println("Running light pattern 4");
     lightPattern4();
   }
   else if (lightPattern == 4)
   {
-    Serial.println("Running light pattern 5");
+    //Serial.println("Running light pattern 5");
     lightPattern5();
   }
 }
@@ -83,10 +83,13 @@ void lightPattern1()
   timeMS = millis();
   g_bpm = rotaryPotBpm(analogRead(0));
   g_bpmMS = 60000 / g_bpm;
+  //Serial.println(g_bpm);
   while ((millis() - timeMS) < (g_bpmMS / 2))
   {
     rampValue = rampValue + (250 / (g_bpmMS / 2));
+    delay(1);
     //Serial.println(rampValue);
+    analogWrite(blue,rampValue);
     matrix.print(rampValue);
   }
   //beatTimer();
@@ -94,7 +97,9 @@ void lightPattern1()
   while ((millis() - timeMS) < (g_bpmMS / 2))
   {
     rampValue = rampValue - (250 / (g_bpmMS / 2));
+    delay(1);
     //Serial.println(rampValue);
+    analogWrite(blue,rampValue);
     matrix.print(rampValue);
   }
 }
@@ -127,7 +132,7 @@ if (lightPattern = 4)
 { 
   lightPattern = 0; 
 }
-Serial.println("lightPattern = " + lightPattern);
+//Serial.println("lightPattern = " + lightPattern);
 }
 
 //*********************************
@@ -139,7 +144,7 @@ void button2push()
 //*********************************
 int rotaryPotBpm(int inputVal)
 {
-  Serial.println(inputVal);
+  //Serial.println(inputVal);
   if(inputVal < 51)
   { g_bpm = 115; }
   else if(inputVal < 102)
@@ -182,7 +187,7 @@ int rotaryPotBpm(int inputVal)
   { g_bpm = 134; }
   else if(inputVal < 1023)
   { g_bpm = 134; }
-  Serial.println(g_bpm);
+  //Serial.println(g_bpm);
   return g_bpm;
 }
 
@@ -191,5 +196,5 @@ void beatTimer()
 {
   digitalWrite(13, digitalRead(13) ^ 1);
   g_bpm = g_bpm + 1;
-  Serial.println(g_bpm);
+  //Serial.println(g_bpm);
 }
