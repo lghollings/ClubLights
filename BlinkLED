@@ -18,7 +18,7 @@ int potPin = 2;
 int potVal = 0;
 int buttonPin = 3;
 int lightPattern = 0;
-unsigned long g_bpm = 100;
+unsigned long g_bpm = 60;
 unsigned long g_bpmMS = 60000 / g_bpm;
 unsigned long timeMS = 0;
 
@@ -81,15 +81,16 @@ void lightPattern1()
   unsigned long rampValue = 0;
   delay(1);
   timeMS = millis();
-  g_bpm = rotaryPotBpm(analogRead(0));
+  //g_bpm = rotaryPotBpm(analogRead(0));
+  g_bpm = 120;
   g_bpmMS = 60000 / g_bpm;
   //Serial.println(g_bpm);
   while ((millis() - timeMS) < (g_bpmMS / 2))
   {
     rampValue = rampValue + (250 / (g_bpmMS / 2));
     delay(1);
-    //Serial.println(rampValue);
-    analogWrite(blue,rampValue);
+    Serial.println(rampValue);
+    analogWrite(red,rampValue);
     matrix.print(rampValue);
   }
   //beatTimer();
@@ -98,8 +99,8 @@ void lightPattern1()
   {
     rampValue = rampValue - (250 / (g_bpmMS / 2));
     delay(1);
-    //Serial.println(rampValue);
-    analogWrite(blue,rampValue);
+    Serial.println(rampValue);
+    analogWrite(red,rampValue);
     matrix.print(rampValue);
   }
 }
