@@ -18,6 +18,8 @@ int potPin = 2;
 int potVal = 0;
 int buttonPin = 3;
 int lightPattern = 0;
+int g_lightColor = 0;
+int g_lightPin = 3;
 unsigned long g_bpm = 60;
 unsigned long g_bpmMS = 60000 / g_bpm;
 unsigned long timeMS = 0;
@@ -78,6 +80,7 @@ void loop()
 //*********************************
 void lightPattern1()
 {
+  changeColor();
   unsigned long rampValue = 0;
   delay(1);
   timeMS = millis();
@@ -87,20 +90,20 @@ void lightPattern1()
   //Serial.println(g_bpm);
   while ((millis() - timeMS) < (g_bpmMS / 2))
   {
-    rampValue = rampValue + (250 / (g_bpmMS / 2));
+    rampValue = rampValue + (1200 / (g_bpmMS / 2));
     delay(1);
     Serial.println(rampValue);
-    analogWrite(red,rampValue);
+    analogWrite(g_lightPin,rampValue);
     matrix.print(rampValue);
   }
   //beatTimer();
   timeMS = millis();
   while ((millis() - timeMS) < (g_bpmMS / 2))
   {
-    rampValue = rampValue - (250 / (g_bpmMS / 2));
+    rampValue = rampValue - (1200 / (g_bpmMS / 2));
     delay(1);
     Serial.println(rampValue);
-    analogWrite(red,rampValue);
+    analogWrite(g_lightPin,rampValue);
     matrix.print(rampValue);
   }
 }
@@ -198,4 +201,28 @@ void beatTimer()
   digitalWrite(13, digitalRead(13) ^ 1);
   g_bpm = g_bpm + 1;
   //Serial.println(g_bpm);
+}
+
+//*********************************
+void changeColor()
+{
+g_lightColor = g_lightColor + 1;
+if(g_lightColor == 3)
+  {
+    g_lightColor = 0;
+  }
+  //
+  //
+if(g_lightColor == 0)
+  {
+    g_lightPin = 3;
+  }
+else if(g_lightColor == 1)
+  {
+    g_lightPin = 5;
+  }
+else if(g_lightColor == 2)
+  {
+    g_lightPin = 6;
+  }
 }
