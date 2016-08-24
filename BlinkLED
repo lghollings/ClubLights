@@ -17,11 +17,12 @@ int g_iBratio = 2.56;
 int potPin = 2;
 int potVal = 0;
 int buttonPin = 3;
-int lightPattern = 0;
-short g_redPercent = 0;
-short g_greenPercent = 0;
-short g_bluePercent = 0;
-unsigned long g_bpm = 60;
+int g_lightColor;
+int lightPattern = 0; //Light Pattern
+float g_redPercent = 0;
+float g_greenPercent = 0;
+float g_bluePercent = 0;
+unsigned long g_bpm = 120; //Tempo BPM
 unsigned long g_bpmMS = 60000 / g_bpm;
 unsigned long timeMS = 0;
 
@@ -35,7 +36,7 @@ void setup()
   pinMode(red, OUTPUT);
   pinMode(green, OUTPUT);
   pinMode(blue, OUTPUT);
-}
+} 
 
 //*********************************
 void loop()
@@ -45,7 +46,7 @@ void loop()
   
   //potVal = analogRead(0); //read pin 2 analog value from pot each loop
   //Serial.println(potVal);
-  Serial.println(g_bpm);
+  //Serial.println(g_bpm);
   
   //matrix.writeDigitNum(
   
@@ -86,14 +87,13 @@ void lightPattern1()
   delay(1);
   timeMS = millis();
   //g_bpm = rotaryPotBpm(analogRead(0));
-  g_bpm = 120;
-  g_bpmMS = 60000 / g_bpm;
+  g_bpmMS = (60000 / g_bpm) - 2  ; //-1 for delay adjustment during loops
   //Serial.println(g_bpm);
   while ((millis() - timeMS) < (g_bpmMS / 2))
   {
     rampValue = rampValue + (1200 / (g_bpmMS / 2));
-    delay(1);
-    Serial.println(rampValue);
+    delay(5);
+    //Serial.println(rampValue);
     //
     analogWrite(red,rampValue * g_redPercent);
     analogWrite(green,rampValue * g_greenPercent);
@@ -106,8 +106,8 @@ void lightPattern1()
   while ((millis() - timeMS) < (g_bpmMS / 2))
   {
     rampValue = rampValue - (1200 / (g_bpmMS / 2));
-    delay(1);
-    Serial.println(rampValue);
+    delay(5);
+    //Serial.println(rampValue);
     //
     analogWrite(red,rampValue * g_redPercent);
     analogWrite(green,rampValue * g_greenPercent);
@@ -116,10 +116,31 @@ void lightPattern1()
     matrix.print(rampValue);
   }
 }
+
 //*********************************
 void lightPattern2()
 {
-  
+  changeColor();
+  delay(1);
+  //g_bpm = rotaryPotBpm(analogRead(0));
+  g_bpmMS = (60000 / g_bpm) - 3  ; //-1 for delay adjustment during loops
+  //Serial.println(g_bpm); 
+  timeMS = millis();
+  while ((millis() - timeMS) < (g_bpmMS / 10))
+  {
+    //delay(6);
+    analogWrite(red,1200 * g_redPercent);
+    analogWrite(green,1200 * g_greenPercent);
+    analogWrite(blue,1200 * g_bluePercent);
+  }
+  timeMS = millis();
+  while ((millis() - timeMS) < (g_bpmMS / 1.1))
+  {
+    //delay(6);
+    analogWrite(red,0);
+    analogWrite(green,0);
+    analogWrite(blue,0);
+  } 
 }
 //*********************************
 void lightPattern3()
@@ -208,15 +229,14 @@ int rotaryPotBpm(int inputVal)
 void beatTimer()
 {
   digitalWrite(13, digitalRead(13) ^ 1);
-  g_bpm = g_bpm + 1;
+  g_bpm = g_bpm + 0;
   //Serial.println(g_bpm);
 }
-
 //*********************************
 void changeColor()
 {
 g_lightColor = g_lightColor + 1;
-if(g_lightColor == 3)
+if(g_lightColor == 4)
   {
     g_lightColor = 0;
   }
@@ -224,20 +244,34 @@ if(g_lightColor == 3)
   //
 if(g_lightColor == 0)
   {
+    //red
     g_redPercent = 1;
     g_greenPercent = 0;
     g_bluePercent = 0;
   }
 else if(g_lightColor == 1)
   {
+    //purple
     g_redPercent = 1;
     g_greenPercent = 0;
-    g_bluePercent = 1;
+    g_bluePercent = .6 ;
   }
 else if(g_lightColor == 2)
   {
+    //blue
     g_redPercent = 0;
     g_greenPercent = 0;
     g_bluePercent = 1;
   }
+  else if(g_lightColor == 3)
+  {
+    //blue
+    g_redPercent = 0;
+    g_greenPercent = 1;
+    g_bluePercent = 1;
+  }
+  /*
+  Serial.println(g_redPercent);
+  Serial.println(g_greenPercent);
+  Serial.println(g_bluePercent);*/
 }
