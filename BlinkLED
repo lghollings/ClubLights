@@ -17,7 +17,7 @@ int g_iBratio = 2.56;
 int potPin = 2;
 int potVal = 0;
 int buttonPin1 = 3;
-int buttonPin1 = 5;
+int buttonPin2 = 5;
 int g_lightColor;
 int lightPattern = 0; //Light Pattern
 float g_redPercent = 0;
