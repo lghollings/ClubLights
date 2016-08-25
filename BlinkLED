@@ -19,13 +19,13 @@ int potVal = 0;
 int buttonPin1 = 3;
 int buttonPin2 = 5;
 int g_lightColor;
-int lightPattern = 0; //Light Pattern
+int lightPattern = 3; //Light Pattern
 float g_redPercent = 0;
 float g_greenPercent = 0;
 float g_bluePercent = 0;
 unsigned long g_bpm = 120; //Tempo BPM
 unsigned long g_bpmMS = 60000 / g_bpm;
-unsigned long g_bpmMSslow = 60000 / 10; //Slow BPM for slow changing lights
+unsigned long g_bpmMSslow = 60000 / 40; //Slow BPM for slow changing lights
 unsigned long timeMS = 0;
 unsigned long timeMS2 = 0;
 unsigned long timeMS3 = 0;
@@ -36,8 +36,8 @@ void setup()
   Serial.begin(9600);
   delay(150);
   matrix.print(g_bpm);
-  attachInterrupt(digitalPinToInterrupt(buttonPin1), button1push(), RISING);
-  attachInterrupt(digitalPinToInterrupt(buttonPin2), button2push(), RISING);
+  //attachInterrupt(digitalPinToInterrupt(buttonPin1), button1push, RISING);
+  //attachInterrupt(digitalPinToInterrupt(buttonPin2), button2push, RISING);
   pinMode(red, OUTPUT);
   pinMode(green, OUTPUT);
   pinMode(blue, OUTPUT);
@@ -57,28 +57,28 @@ void loop()
   
   //g_bpm = 115 + (potVal / (1023 / 20)); //40bpm spread starting at 100 bpm
   
-  //Serial.println(lightPattern);
-  if (lightPattern == 0)
+  Serial.println(lightPattern);
+  if (lightPattern == 1)
   {
     //Serial.println("Running light pattern 1");
     lightPattern1();
   }
-  else if (lightPattern == 1)
+  else if (lightPattern == 2)
   {
     //Serial.println("Running light pattern 2");
     lightPattern2();
   }
-  else if (lightPattern == 2)
+  else if (lightPattern == 3)
   {
     //Serial.println("Running light pattern 3");
     lightPattern3();
   }
-  else if (lightPattern == 3)
+  else if (lightPattern == 4)
   {
     //Serial.println("Running light pattern 4");
     lightPattern4();
   }
-  else if (lightPattern == 4)
+  else if (lightPattern == 5)
   {
     //Serial.println("Running light pattern 5");
     lightPattern5();
@@ -123,6 +123,7 @@ void lightPattern2()
 //Flash color on beat
   changeColor();
   delay(1);
+  unsigned long rampValue = 0;
   //g_bpm = rotaryPotBpm(analogRead(0));
   g_bpmMS = (60000 / g_bpm) - 3  ; //-1 for delay adjustment during loops
   //Serial.println(g_bpm); 
@@ -149,9 +150,14 @@ void lightPattern3()
   // Slow light blend between colors
   // Constant slow BPM 70 bpm?
   // colors: purple, blue, pink, 
-  while ((millis() - timeMS) < (g_bpmMSslow / 2))
+  g_bpmMSslow = 1900;
+  changeColor();
+  unsigned long rampValue = 0;
+  delay(1);
+  timeMS = millis();
+  while ((millis() - timeMS) < (g_bpmMSslow))
   {
-    rampValue = rampValue + (1200 / (g_bpmMSslow / 2));
+    rampValue = rampValue + (2000 / (g_bpmMSslow));
     delay(5);
     //Serial.println(rampValue);
     analogWrite(red,rampValue * g_redPercent);
@@ -160,9 +166,9 @@ void lightPattern3()
   }
   //beatTimer();
   timeMS = millis();
-  while ((millis() - timeMS) < (g_bpmMSslow / 2))
+  while ((millis() - timeMS) < (g_bpmMSslow))
   {
-    rampValue = rampValue - (1200 / (g_bpmMSslow / 2));
+    rampValue = rampValue - (2000 / (g_bpmMSslow));
     delay(5);
     //Serial.println(rampValue);
     analogWrite(red,rampValue * g_redPercent);
@@ -185,9 +191,9 @@ void lightPattern5()
 void button1push()
 {
 lightPattern = lightPattern + 1;
-if (lightPattern = 4)
+if (lightPattern = 5)
 { 
-  lightPattern = 0; 
+  lightPattern = 1; 
 }
 //Serial.println("lightPattern = " + lightPattern);
 }
