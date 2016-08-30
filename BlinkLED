@@ -2,9 +2,12 @@
 #include "Adafruit_GFX.h"
 #include <Wire.h>
 
-#define red 3
-#define green 6
-#define blue 5
+#define red1 3
+#define green1 6
+#define blue1 5
+#define red2 9
+#define green2 11
+#define blue2 10
 #define delaya 2
 
 Adafruit_7segment matrix = Adafruit_7segment();
@@ -38,9 +41,12 @@ void setup()
   matrix.print(g_bpm);
   //attachInterrupt(digitalPinToInterrupt(buttonPin1), button1push, RISING);
   //attachInterrupt(digitalPinToInterrupt(buttonPin2), button2push, RISING);
-  pinMode(red, OUTPUT);
-  pinMode(green, OUTPUT);
-  pinMode(blue, OUTPUT);
+  pinMode(red1, OUTPUT);
+  pinMode(green1, OUTPUT);
+  pinMode(blue1, OUTPUT);
+  pinMode(red2, OUTPUT);
+  pinMode(green2, OUTPUT);
+  pinMode(blue2, OUTPUT);
 } 
 
 //*********************************
@@ -100,9 +106,9 @@ void lightPattern1()
     rampValue = rampValue + (1200 / (g_bpmMS / 2));
     delay(5);
     //Serial.println(rampValue);
-    analogWrite(red,rampValue * g_redPercent);
-    analogWrite(green,rampValue * g_greenPercent);
-    analogWrite(blue,rampValue * g_bluePercent);
+    analogWrite(red1,rampValue * g_redPercent);
+    analogWrite(green1,rampValue * g_greenPercent);
+    analogWrite(blue1,rampValue * g_bluePercent);
   }
   //beatTimer();
   timeMS = millis();
@@ -111,9 +117,9 @@ void lightPattern1()
     rampValue = rampValue - (1200 / (g_bpmMS / 2));
     delay(5);
     //Serial.println(rampValue);
-    analogWrite(red,rampValue * g_redPercent);
-    analogWrite(green,rampValue * g_greenPercent);
-    analogWrite(blue,rampValue * g_bluePercent);
+    analogWrite(red1,rampValue * g_redPercent);
+    analogWrite(green1,rampValue * g_greenPercent);
+    analogWrite(blue1,rampValue * g_bluePercent);
   }
 }
 
@@ -131,17 +137,17 @@ void lightPattern2()
   while ((millis() - timeMS) < (g_bpmMS / 10))
   {
     //delay(6);
-    analogWrite(red,1200 * g_redPercent);
-    analogWrite(green,1200 * g_greenPercent);
-    analogWrite(blue,1200 * g_bluePercent);
+    analogWrite(red1,1200 * g_redPercent);
+    analogWrite(green1,1200 * g_greenPercent);
+    analogWrite(blue1,1200 * g_bluePercent);
   }
   timeMS = millis();
   while ((millis() - timeMS) < (g_bpmMS / 1.1))
   {
     //delay(6);
-    analogWrite(red,0);
-    analogWrite(green,0);
-    analogWrite(blue,0);
+    analogWrite(red1,0);
+    analogWrite(green1,0);
+    analogWrite(blue1,0);
   } 
 }
 //*********************************
@@ -150,30 +156,38 @@ void lightPattern3()
   // Slow light blend between colors
   // Constant slow BPM 70 bpm?
   // colors: purple, blue, pink, 
-  g_bpmMSslow = 1900;
+  g_bpmMSslow = 1300;
   changeColor();
   unsigned long rampValue = 0;
   delay(1);
   timeMS = millis();
   while ((millis() - timeMS) < (g_bpmMSslow))
   {
-    rampValue = rampValue + (2000 / (g_bpmMSslow));
+    rampValue = rampValue + (1500 / (g_bpmMSslow));
     delay(5);
-    //Serial.println(rampValue);
-    analogWrite(red,rampValue * g_redPercent);
-    analogWrite(green,rampValue * g_greenPercent);
-    analogWrite(blue,rampValue * g_bluePercent);
+    Serial.println(rampValue);
+    analogWrite(red1,rampValue * g_redPercent);
+    analogWrite(green1,rampValue * g_greenPercent);
+    analogWrite(blue1,rampValue * g_bluePercent);
+    //
+    analogWrite(red2,rampValue * g_redPercent);
+    analogWrite(green2,rampValue * g_greenPercent);
+    analogWrite(blue2,rampValue * g_bluePercent);
   }
   //beatTimer();
   timeMS = millis();
   while ((millis() - timeMS) < (g_bpmMSslow))
   {
-    rampValue = rampValue - (2000 / (g_bpmMSslow));
+    rampValue = rampValue - (1500 / (g_bpmMSslow));
     delay(5);
-    //Serial.println(rampValue);
-    analogWrite(red,rampValue * g_redPercent);
-    analogWrite(green,rampValue * g_greenPercent);
-    analogWrite(blue,rampValue * g_bluePercent);
+    Serial.println(rampValue);
+    analogWrite(red1,rampValue * g_redPercent);
+    analogWrite(green1,rampValue * g_greenPercent);
+    analogWrite(blue1,rampValue * g_bluePercent);
+    //
+    analogWrite(red2,rampValue * g_redPercent);
+    analogWrite(green2,rampValue * g_greenPercent);
+    analogWrite(blue2,rampValue * g_bluePercent);
   }
 }
 //*********************************
@@ -268,7 +282,7 @@ void beatTimer()
 void changeColor()
 {
 g_lightColor = g_lightColor + 1;
-if(g_lightColor == 4)
+if(g_lightColor == 6)
   {
     g_lightColor = 0;
   }
@@ -293,13 +307,27 @@ else if(g_lightColor == 2)
     //blue
     g_redPercent = 0;
     g_greenPercent = 0;
-    g_bluePercent = 1;
+    g_bluePercent = .5;
   }
 else if(g_lightColor == 3)
   {
     //blue
     g_redPercent = 0;
+    g_greenPercent = .5;
+    g_bluePercent = .5;
+  }
+else if(g_lightColor == 4)
+  {
+    //blue
+    g_redPercent = .5;
     g_greenPercent = 1;
-    g_bluePercent = 1;
+    g_bluePercent = 0;
+  }
+  else if(g_lightColor == 5)
+  {
+    //blue
+    g_redPercent = .5;
+    g_greenPercent = .7;
+    g_bluePercent = .5;
   }
 }
