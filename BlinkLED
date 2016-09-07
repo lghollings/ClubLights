@@ -1,5 +1,4 @@
-#include "Adafruit_LEDBackpack.h"
-#include "Adafruit_GFX.h"
+#include <SPI.h>
 #include <Wire.h>
 
 #define red1 3
@@ -10,7 +9,6 @@
 #define blue2 10
 #define delaya 2
 
-Adafruit_7segment matrix = Adafruit_7segment();
 int g_iR = 0;
 int g_iG = 0;
 int g_iB = 0;
@@ -22,7 +20,9 @@ int potVal = 0;
 int buttonPin1 = 3;
 int buttonPin2 = 5;
 int g_lightColor;
-int lightPattern = 3; //Light Pattern
+int lightPattern = 4; //Light Pattern
+const int ssPin = 8; // SS Pin for Display
+char tempString[10];  // Will be used with sprintf to create strings
 float g_redPercent = 0;
 float g_greenPercent = 0;
 float g_bluePercent = 0;
@@ -38,7 +38,16 @@ void setup()
 {
   Serial.begin(9600);
   delay(150);
-  matrix.print(g_bpm);
+  pinMode(ssPin, OUTPUT);  // Set the SS pin as an output
+  digitalWrite(ssPin, HIGH);  // Set the SS pin HIGH
+  SPI.begin();  // Begin SPI hardware
+  SPI.setClockDivider(SPI_CLOCK_DIV64);  // Slow down SPI clock
+  clearDisplaySPI();  // Clears display, resets cursor
+
+  s7sSendStringSPI("----");
+  //setDecimalsSPI(0b111111);  // Turn on all decimals, colon, apos
+  setBrightnessSPI(255);
+  //setDecimalsSPI(0b111111);  // Turn on all decimals, colon, apos
   //attachInterrupt(digitalPinToInterrupt(buttonPin1), button1push, RISING);
   //attachInterrupt(digitalPinToInterrupt(buttonPin2), button2push, RISING);
   pinMode(red1, OUTPUT);
@@ -159,7 +168,7 @@ void lightPattern3()
   g_bpmMSslow = 1300;
   changeColor();
   unsigned long rampValue = 0;
-  delay(1);
+  delay(200);
   timeMS = millis();
   while ((millis() - timeMS) < (g_bpmMSslow))
   {
@@ -169,10 +178,6 @@ void lightPattern3()
     analogWrite(red1,rampValue * g_redPercent);
     analogWrite(green1,rampValue * g_greenPercent);
     analogWrite(blue1,rampValue * g_bluePercent);
-    //
-    analogWrite(red2,rampValue * g_redPercent);
-    analogWrite(green2,rampValue * g_greenPercent);
-    analogWrite(blue2,rampValue * g_bluePercent);
   }
   //beatTimer();
   timeMS = millis();
@@ -184,16 +189,46 @@ void lightPattern3()
     analogWrite(red1,rampValue * g_redPercent);
     analogWrite(green1,rampValue * g_greenPercent);
     analogWrite(blue1,rampValue * g_bluePercent);
-    //
-    analogWrite(red2,rampValue * g_redPercent);
-    analogWrite(green2,rampValue * g_greenPercent);
-    analogWrite(blue2,rampValue * g_bluePercent);
   }
 }
 //*********************************
 void lightPattern4()
 {
-  
+  // Slow light blend between colors
+  // Constant slow BPM 70 bpm?
+  // colors: purple, blue, pink, 
+  g_bpmMSslow = 1300;
+  changeColor();
+  unsigned long rampValue = 0;
+  delay(200);
+  int v1 = rand();
+  int v2 = rand();
+  int v3 = rand();
+  timeMS = millis();
+  while ((millis() - timeMS) < (g_bpmMSslow))
+  {
+    rampValue = rampValue + (1500 / (g_bpmMSslow));
+    delay(5);
+    Serial.println(rampValue);
+    sprintf(tempString, "%4d", rampValue);
+    s7sSendStringSPI(tempString);
+    analogWrite(red1,rampValue * v1);
+    analogWrite(green1,rampValue * v2);
+    analogWrite(blue1,rampValue * v3);
+  }
+  //beatTimer();
+  timeMS = millis();
+  while ((millis() - timeMS) < (g_bpmMSslow))
+  {
+    rampValue = rampValue - (1500 / (g_bpmMSslow));
+    delay(5);
+    Serial.println(rampValue);
+    sprintf(tempString, "%4d", rampValue);
+    s7sSendStringSPI(tempString);
+    analogWrite(red1,rampValue * v1);
+    analogWrite(green1,rampValue * v2);
+    analogWrite(blue1,rampValue * v3);
+  }
 }
 //*********************************
 void lightPattern5()
@@ -330,4 +365,49 @@ else if(g_lightColor == 4)
     g_greenPercent = .7;
     g_bluePercent = .5;
   }
+}
+// This custom function works somewhat like a serial.print.
+//  You can send it an array of chars (string) and it'll print
+//  the first 4 characters in the array.
+void s7sSendStringSPI(String toSend)
+{
+  digitalWrite(ssPin, LOW);
+  for (int i=0; i<4; i++)
+  {
+    SPI.transfer(toSend[i]);
+  }
+  digitalWrite(ssPin, HIGH);
+}
+
+// Send the clear display command (0x76)
+//  This will clear the display and reset the cursor
+void clearDisplaySPI()
+{
+  digitalWrite(ssPin, LOW);
+  SPI.transfer(0x76);  // Clear display command
+  digitalWrite(ssPin, HIGH);
+}
+
+// Set the displays brightness. Should receive byte with the value
+//  to set the brightness to
+//  dimmest------------->brightest
+//     0--------127--------255
+void setBrightnessSPI(byte value)
+{
+  digitalWrite(ssPin, LOW);
+  SPI.transfer(0x7A);  // Set brightness command byte
+  SPI.transfer(value);  // brightness data byte
+  digitalWrite(ssPin, HIGH);
+}
+
+// Turn on any, none, or all of the decimals.
+//  The six lowest bits in the decimals parameter sets a decimal 
+//  (or colon, or apostrophe) on or off. A 1 indicates on, 0 off.
+//  [MSB] (X)(X)(Apos)(Colon)(Digit 4)(Digit 3)(Digit2)(Digit1)
+void setDecimalsSPI(byte decimals)
+{
+  digitalWrite(ssPin, LOW);
+  SPI.transfer(0x77);
+  SPI.transfer(decimals);
+  digitalWrite(ssPin, HIGH);
 }
