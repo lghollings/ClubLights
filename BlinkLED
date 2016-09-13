@@ -20,13 +20,13 @@ int potVal = 0;
 int buttonPin1 = 3;
 int buttonPin2 = 5;
 int g_lightColor;
-int lightPattern = 1; //Light Pattern
+int lightPattern = 5; //Light Pattern
 const int ssPin = 8; // SS Pin for Display
 char tempString[10];  // Will be used with sprintf to create strings
 float g_redPercent = 0;
 float g_greenPercent = 0;
 float g_bluePercent = 0;
-float g_bpm = 125; //Tempo BPM
+float g_bpm = 124; //Tempo BPM
 unsigned long g_bpmMS = 60000 / g_bpm;
 unsigned long g_bpmMSslow = 60000 / 40; //Slow BPM for slow changing lights
 unsigned long timeMS = 0;
@@ -232,7 +232,38 @@ void lightPattern4()
 //*********************************
 void lightPattern5()
 {
-  
+  // Slow light blend between colors
+  // Constant slow BPM 70 bpm?
+  // colors: purple, blue, pink, 
+  g_bpmMSslow = 1300;
+  changeColor();
+  unsigned long rampValue = 0;
+  delay(200);
+  int v1 = rand();
+  int v2 = rand();
+  int v3 = rand();
+  timeMS = millis();
+  while ((millis() - timeMS) < (g_bpmMSslow))
+  {
+    rampValue = rampValue + (1500 / (g_bpmMSslow));
+    delay(5);
+    Serial.println(rampValue);
+    analogWrite(red1,rampValue * v1);
+    analogWrite(green1,rampValue * v2);
+    analogWrite(blue1,rampValue * v3);
+  }
+  //beatTimer();
+  delay(2000);
+  timeMS = millis();
+  while ((millis() - timeMS) < (g_bpmMSslow))
+  {
+    rampValue = rampValue - (1500 / (g_bpmMSslow));
+    delay(5);
+    Serial.println(rampValue);
+    analogWrite(red1,rampValue * v1);
+    analogWrite(green1,rampValue * v2);
+    analogWrite(blue1,rampValue * v3);
+  }
 }
 
 //*********************************
