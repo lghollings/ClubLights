@@ -20,13 +20,13 @@ int potVal = 0;
 int buttonPin1 = 3;
 int buttonPin2 = 5;
 int g_lightColor;
-int lightPattern = 4; //Light Pattern
+int lightPattern = 1; //Light Pattern
 const int ssPin = 8; // SS Pin for Display
 char tempString[10];  // Will be used with sprintf to create strings
 float g_redPercent = 0;
 float g_greenPercent = 0;
 float g_bluePercent = 0;
-unsigned long g_bpm = 120; //Tempo BPM
+float g_bpm = 125; //Tempo BPM
 unsigned long g_bpmMS = 60000 / g_bpm;
 unsigned long g_bpmMSslow = 60000 / 40; //Slow BPM for slow changing lights
 unsigned long timeMS = 0;
@@ -61,43 +61,43 @@ void setup()
 //*********************************
 void loop()
 {
-  //Serial.println(g_bpm);
-  //Serial.println(millis());
-  
-  //potVal = analogRead(0); //read pin 2 analog value from pot each loop
+  g_bpm = 115 + (rotaryPotBpm(analogRead(potPin)));
+  float g_bpm_temp = g_bpm*10;
+  sprintf(tempString, "%d", (int)g_bpm_temp);
+  Serial.println(g_bpm);
+  Serial.println(tempString);
+  s7sSendStringSPI(tempString);
+  setDecimalsSPI(0b00000100);
   //Serial.println(potVal);
-  //Serial.println(g_bpm);
   
-  //matrix.writeDigitNum(
-  
-  //g_bpm = 115 + (potVal / (1023 / 20)); //40bpm spread starting at 100 bpm
-  
-  Serial.println(lightPattern);
   if (lightPattern == 1)
   {
-    //Serial.println("Running light pattern 1");
     lightPattern1();
   }
   else if (lightPattern == 2)
   {
-    //Serial.println("Running light pattern 2");
     lightPattern2();
   }
   else if (lightPattern == 3)
   {
-    //Serial.println("Running light pattern 3");
     lightPattern3();
   }
   else if (lightPattern == 4)
   {
-    //Serial.println("Running light pattern 4");
     lightPattern4();
   }
   else if (lightPattern == 5)
   {
-    //Serial.println("Running light pattern 5");
     lightPattern5();
   }
+}
+//*********************************
+float rotaryPotBpm(int inputVal)
+{
+  float floatValue = inputVal/48.473684211;
+  //Serial.println(inputVal);
+  //Serial.println(floatValue);
+  return floor(floatValue*10+0.5)/10;;
 }
 //*********************************
 void lightPattern1()
@@ -110,14 +110,17 @@ void lightPattern1()
   //g_bpm = rotaryPotBpm(analogRead(0));
   g_bpmMS = (60000 / g_bpm) - 2  ; //-1 for delay adjustment during loops
   //Serial.println(g_bpm);
+  int v1 = rand();
+  int v2 = rand();
+  int v3 = rand();
   while ((millis() - timeMS) < (g_bpmMS / 2))
   {
     rampValue = rampValue + (1200 / (g_bpmMS / 2));
     delay(5);
     //Serial.println(rampValue);
-    analogWrite(red1,rampValue * g_redPercent);
-    analogWrite(green1,rampValue * g_greenPercent);
-    analogWrite(blue1,rampValue * g_bluePercent);
+    analogWrite(red1,rampValue * v1);
+    analogWrite(green1,rampValue * v2);
+    analogWrite(blue1,rampValue * v3);
   }
   //beatTimer();
   timeMS = millis();
@@ -126,9 +129,9 @@ void lightPattern1()
     rampValue = rampValue - (1200 / (g_bpmMS / 2));
     delay(5);
     //Serial.println(rampValue);
-    analogWrite(red1,rampValue * g_redPercent);
-    analogWrite(green1,rampValue * g_greenPercent);
-    analogWrite(blue1,rampValue * g_bluePercent);
+    analogWrite(red1,rampValue * v1);
+    analogWrite(green1,rampValue * v2);
+    analogWrite(blue1,rampValue * v3);
   }
 }
 
@@ -210,8 +213,6 @@ void lightPattern4()
     rampValue = rampValue + (1500 / (g_bpmMSslow));
     delay(5);
     Serial.println(rampValue);
-    sprintf(tempString, "%4d", rampValue);
-    s7sSendStringSPI(tempString);
     analogWrite(red1,rampValue * v1);
     analogWrite(green1,rampValue * v2);
     analogWrite(blue1,rampValue * v3);
@@ -223,8 +224,6 @@ void lightPattern4()
     rampValue = rampValue - (1500 / (g_bpmMSslow));
     delay(5);
     Serial.println(rampValue);
-    sprintf(tempString, "%4d", rampValue);
-    s7sSendStringSPI(tempString);
     analogWrite(red1,rampValue * v1);
     analogWrite(green1,rampValue * v2);
     analogWrite(blue1,rampValue * v3);
@@ -255,57 +254,6 @@ void button2push()
  //used to reset light pattern to beginning of pattern
  //used to being light pattern back in sync with music
 }
-
-//*********************************
-int rotaryPotBpm(int inputVal)
-{
-  //Serial.println(inputVal);
-  if(inputVal < 51)
-  { g_bpm = 115; }
-  else if(inputVal < 102)
-  { g_bpm = 116; }
-  else if(inputVal < 153)
-  { g_bpm = 117; }
-  else if(inputVal < 205)
-  { g_bpm = 118; }
-  else if(inputVal < 256)
-  { g_bpm = 119; }
-  else if(inputVal < 307)
-  { g_bpm = 120; }
-  else if(inputVal < 358)
-  { g_bpm = 121; }
-  else if(inputVal < 409)
-  { g_bpm = 122; }
-  else if(inputVal < 460)
-  { g_bpm = 123; }
-  else if(inputVal < 512)
-  { g_bpm = 124; }
-  else if(inputVal < 563)
-  { g_bpm = 125; }
-  else if(inputVal < 614)
-  { g_bpm = 126; }
-  else if(inputVal < 665)
-  { g_bpm = 127; }
-  else if(inputVal < 716)
-  { g_bpm = 128; }
-  else if(inputVal < 767)
-  { g_bpm = 129; }
-  else if(inputVal < 818)
-  { g_bpm = 130; }
-  else if(inputVal < 870)
-  { g_bpm = 131; }
-  else if(inputVal < 921)
-  { g_bpm = 132; }
-  else if(inputVal < 972)
-  { g_bpm = 133; }
-  else if(inputVal < 1023)
-  { g_bpm = 134; }
-  else if(inputVal < 1023)
-  { g_bpm = 134; }
-  //Serial.println(g_bpm);
-  return g_bpm;
-}
-
 //*********************************
 void beatTimer()
 {
